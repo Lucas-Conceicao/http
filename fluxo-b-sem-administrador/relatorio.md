@@ -180,7 +180,7 @@ Cabeçalhos:
 | 4 | GET    | `http://httpbin.org/status/418` | [...] | [...] | [sim/não] |
 | 5 | GET    | `http://httpbin.org/status/500` | [...] | [...] | [sim/não] |
 | 6 | GET    | `http://httpbin.org/status/503` | [...] | [...] | [sim/não] |
-| 7 | GET    | `http://example.com/` com `If-Modified-Since` | [...] | [...] | [sim/não] |
+| 7 | GET    | `http://httpbin.org/cache` com `If-Modified-Since` | [...] | [...] | [sim/não] |
 
 ### Pergunta 4.1
 > Em qual dos status o corpo está ausente/tamanho zero? Isso é obrigatório pela especificação ou depende do servidor?
@@ -215,7 +215,7 @@ Cabeçalhos:
 | `Content-Encoding`           | [...]    | [...]            | [...]                |
 | `Set-Cookie`                 | [...]    | [...]            | [...]                |
 | `Cache-Control`              | [...]    | [...]            | [...]                |
-| `Strict-Transport-Security`  | [...]    | [...]            | [...]                |
+| `Strict-Transport-Security`  | Não esperado em HTTP — ver Pergunta 5.3 | — | — |
 
 ### Pergunta 5.1
 > `Content-Encoding: gzip`/`br` apareceu? Compare `Content-Length`, quando presente, com o conteúdo visível. O que explica a diferença?
@@ -290,11 +290,19 @@ Cabeçalhos:
 ### Pergunta 7.2
 > Que atributos o `Set-Cookie` trouxe? Explique cada um presente. Para atributos não observados, registre `não observado`.
 
+> **Nota:** o httpbin define cookies mínimos — apenas o atributo `Path=/` estará presente. Para cada atributo ausente, registre **não observado** e explique o comportamento padrão do navegador na sua ausência (ex.: sem `Expires`/`Max-Age` → cookie de sessão; sem `Secure` → pode ser enviado por HTTP; sem `SameSite` → o navegador aplica a política padrão da versão em uso).
+
 **Resposta:**
 
-| Atributo | Valor | Função |
-|----------|-------|--------|
-| [...]    | [...] | [...]  |
+| Atributo  | Valor | Função | Observado? |
+|-----------|-------|--------|------------|
+| `Path`    | `/`   | [...]  | Sim        |
+| `Domain`  | —     | [...]  | não observado |
+| `Expires` | —     | [...]  | não observado |
+| `Max-Age` | —     | [...]  | não observado |
+| `Secure`  | —     | [...]  | não observado |
+| `HttpOnly`| —     | [...]  | não observado |
+| `SameSite`| —     | [...]  | não observado |
 
 ### Pergunta 7.3
 > O atributo `Secure` pode aparecer num cookie recebido por HTTP puro? Qual seria o comportamento esperado? Relacione com o fato de que todo o tráfego desta atividade é visível em texto claro.
@@ -309,6 +317,8 @@ Cabeçalhos:
 ---
 
 ## Atividade 8 — Manipulação com breakpoints
+
+> **Atividade exclusiva do Fiddler Classic.** Se você utilizou mitmproxy ou HTTP Toolkit, responda às questões 8.1 e 8.2 de forma teórica (sem capturas de tela), indicando que a ferramenta utilizada não suporta breakpoints interativos.
 
 **Captura de tela da edição do User-Agent:** `evidencias/atv8_ua_edit.png`
 
@@ -370,33 +380,7 @@ Location: [colar aqui]
 
 **Resposta:** [...]
 
----
 
-## Questões de Verificação
-
-### 1. Ordem dos elementos em uma mensagem HTTP/1.1. O que separa cabeçalhos do corpo?
-
-[resposta]
-
-### 2. Por que `Host` é obrigatório em HTTP/1.1 mas era opcional em HTTP/1.0?
-
-[resposta]
-
-### 3. Diferença entre `401 Unauthorized` e `403 Forbidden`.
-
-[resposta]
-
-### 4. Um `POST` enviado duas vezes produz o mesmo efeito? E um `PUT`? Justifique em termos de idempotência.
-
-[resposta]
-
-### 5. Por que HTTPS permite ainda que um observador saiba qual site está sendo visitado? (SNI, DNS)
-
-[resposta]
-
-### 6. O que muda com `Content-Encoding: gzip`? Onde os dados são compactados e descompactados?
-
-[resposta]
 
 ### 7. Impacto prático de `Cache-Control: no-store`.
 

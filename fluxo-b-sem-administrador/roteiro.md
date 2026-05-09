@@ -17,9 +17,8 @@
   - [2.3. Validação do ambiente](#23-validação-do-ambiente)
   - [2.4. Sites de teste que aceitam HTTP puro](#24-sites-de-teste-que-aceitam-http-puro)
 - [3. Atividades Práticas](#3-atividades-práticas)
-- [4. Questões de Verificação](#4-questões-de-verificação)
-- [5. Entrega](#5-entrega)
-- [6. Encerramento](#6-encerramento)
+- [4. Entrega](#4-entrega)
+- [5. Encerramento](#5-encerramento)
 
 ---
 
@@ -59,6 +58,8 @@ Você tem pelo menos uma das opções abaixo. Escolha a primeira que funcionar.
 2. Executar `mitmweb` (interface web em `http://127.0.0.1:8081`).
 3. Configurar o proxy do navegador para `127.0.0.1:8080` (ver 2.2).
 
+> ⚠️ **Atenção (mitmproxy).** Por padrão, o mitmproxy intercepta **e decripta** conexões HTTPS, gerando seu próprio certificado. Isso **contradiz o escopo deste fluxo** (sem instalação de certificados). Para capturar apenas HTTP, use a opção `--ignore-hosts '.*'` ao iniciar, ou no painel web filtre para exibir somente sessões na porta 80. **Não instale** o certificado do mitmproxy no armazenamento do sistema.
+
 **Opção 3 — HTTP Toolkit portátil.**
 
 **Download:** https://httptoolkit.tech/ (opção *AppImage*/portátil).
@@ -84,7 +85,7 @@ No Fiddler, acesse **Tools → Options → HTTPS** e **confirme que *Decrypt HTT
 
 Navegadores modernos promovem silenciosamente `http://` para `https://` via HSTS e "HTTPS-First Mode". Para inspecionar HTTP puro, desabilite esse comportamento **só para a sessão do laboratório**:
 
-- **Chrome/Edge:** abra `chrome://settings/security` e desative temporariamente a opção de sempre usar conexões seguras, se disponível. Em algumas versões, também pode ser necessário abrir `chrome://flags` (ou `edge://flags`), procurar **"HTTPS-First Mode"** ou **"HTTPS-Upgrades"**, definir como **Disabled** e reiniciar o navegador. Os nomes podem variar conforme a versão e políticas do laboratório.
+- **Chrome/Edge:** abra `chrome://settings/security` e desative temporariamente a opção de sempre usar conexões seguras, se disponível. Em algumas versões, também pode ser necessário abrir `chrome://flags` (ou `edge://flags`), procurar **"HTTPS-First Mode"**, **"HTTPS-Upgrades"** ou **"Always use secure connections"**, definir como **Disabled** e reiniciar o navegador. Se as flags não aparecerem ou estiverem bloqueadas por política de grupo do laboratório (Group Policy), use o **Firefox** como alternativa — ele permite desabilitar o HTTPS-Only individualmente sem depender de políticas de máquina.
 - **Firefox:** `about:preferences#privacy` → seção **Segurança HTTPS-Only** → escolher **"Não ativar o modo HTTPS-Only"**.
 
 > 💡 Mesmo com essas configurações desabilitadas, sites com HSTS **pré-carregado no navegador** (p. ex. `google.com`, `facebook.com`, grandes bancos) continuarão redirecionando para HTTPS. Use apenas os sites listados na seção 2.4, que **não** estão na lista HSTS preload.
@@ -113,9 +114,11 @@ Todos foram verificados para aceitar conexões não cifradas:
 | 7 | `http://httpbin.org/cookies/set?...`           | Cookies e sessão                                                 |
 | 8 | `http://httpbin.org/user-agent`                | Inspeção de `User-Agent`                                         |
 | 9 | `http://httpbin.org/status/{codigo}` e `http://httpbin.org/redirect-to?...` | Geração controlada de códigos de status (200, 301, 404, 500...)  |
-| 10| `http://eu.httpbin.org/...`                    | Espelho europeu do httpbin, útil se o principal estiver lento    |
-| 11| `http://www.textfiles.com`                     | Site histórico, apenas texto/HTML                                |
-| 12| `http://www.columbia.edu/~fdc/sample.html`     | Página acadêmica estável em HTTP                                 |
+| 10| `http://httpbin.org/cache`                     | Resposta com `Last-Modified` garantido — Atividade 4 (304)       |
+| 11| `http://httpbin.org/response-headers?...`      | Cabeçalhos de resposta customizáveis — Atividade 5               |
+| 12| `http://eu.httpbin.org/...`                    | Espelho europeu do httpbin, útil se o principal estiver lento    |
+| 13| `http://www.textfiles.com`                     | Site histórico, apenas texto/HTML                                |
+| 14| `http://www.columbia.edu/~fdc/sample.html`     | Página acadêmica estável em HTTP                                 |
 
 ---
 
@@ -131,6 +134,9 @@ Todos foram verificados para aceitar conexões não cifradas:
 **Objetivo:** validar o ambiente e familiarizar-se com a interface.
 
 1. Com o Fiddler capturando, abrir o navegador e acessar `http://example.com`.
+
+   > 💡 **Se o navegador redirecionar para `https://`** mesmo após a seção 2.2: no Chrome/Edge, acesse `chrome://net-internals/#hsts`, campo **"Delete domain security policies"**, digite `example.com` e clique **Delete** para remover o registro HSTS em cache de sessões anteriores. No Firefox, limpe os dados de sessão em `about:preferences#privacy → Limpar dados`.
+
 2. Identificar a sessão correspondente na lista do Fiddler (coluna `Host` = `example.com`).
 3. Selecionar a sessão e, no painel `Inspectors`, abrir a aba **Raw** (tanto em Request quanto em Response).
 
@@ -149,7 +155,7 @@ Todos foram verificados para aceitar conexões não cifradas:
 
 **Objetivo:** dissecar uma requisição GET com *query string* e correlacioná-la à resposta.
 
-1. Acessar no navegador: `http://httpbin.org/get?aluno=SEU_NOME&curso=redes`.
+1. Acessar no navegador: `http://httpbin.org/get?aluno=SEU_NOME&curso=redes` — **substituindo `SEU_NOME` pelo seu próprio nome** (sem espaços; use underline se necessário, ex: `joao_silva`). Isso identifica sua captura no relatório.
 2. Localizar a sessão no Fiddler.
 3. Inspecionar em **Request → Raw** e **Response → JSON**.
 
@@ -185,7 +191,18 @@ Todos foram verificados para aceitar conexões não cifradas:
 
 **Pergunta 3.2:** Na aba **Request → WebForms** do Fiddler, o conteúdo aparece tabulado. Compare com a aba **Raw**: qual das duas visões corresponde literalmente aos bytes enviados no socket TCP?
 
-**Pergunta 3.3:** Usando a aba **Composer** do Fiddler, envie manualmente um `POST` para `http://httpbin.org/post` com `Content-Type: application/json` e o corpo `{"protocolo":"HTTP","versao":"1.1"}`. Registre a *response* completa. Que campo do JSON de resposta confirma que o servidor recebeu e interpretou corretamente o JSON?
+**Pergunta 3.3:** Envie manualmente um `POST` para `http://httpbin.org/post` com `Content-Type: application/json` e o corpo `{"protocolo":"HTTP","versao":"1.1"}`. Registre a *response* completa. Que campo do JSON de resposta confirma que o servidor recebeu e interpretou corretamente o JSON?
+
+> **Como enviar o POST manual:**
+> - **Fiddler Classic:** aba **Composer** → preencha a URL, selecione método `POST`, adicione o cabeçalho `Content-Type: application/json` na área de cabeçalhos e o corpo na área de texto abaixo. Clique em **Execute**.
+> - **Sem Fiddler (mitmproxy / HTTP Toolkit):** abra um terminal PowerShell e execute:
+>   ```powershell
+>   Invoke-WebRequest -Uri "http://httpbin.org/post" -Method POST -ContentType "application/json" -Body '{"protocolo":"HTTP","versao":"1.1"}' | Select-Object -ExpandProperty Content
+>   ```
+>   Ou com `curl` (se disponível):
+>   ```bash
+>   curl -X POST http://httpbin.org/post -H "Content-Type: application/json" -d '{"protocolo":"HTTP","versao":"1.1"}'
+>   ```
 
 ---
 
@@ -209,8 +226,8 @@ Para cada URL abaixo, acesse no navegador e localize a sessão no Fiddler:
 | 6 | `http://httpbin.org/status/503`       | 5xx             |
 
 Adicionalmente, para observar um **304 Not Modified** de forma controlada:
-7. Acesse `http://example.com`, aguarde carregar e anote o cabeçalho `Last-Modified` da resposta.
-8. No **Composer** do Fiddler (ou ferramenta equivalente), envie um `GET` para `http://example.com/` incluindo o cabeçalho `If-Modified-Since` com o valor exato de `Last-Modified` observado no passo anterior.
+7. Acesse `http://httpbin.org/cache`, aguarde carregar e anote o cabeçalho `Last-Modified` da resposta (visível em **Inspectors → Response → Headers**). Este endpoint garante a presença do cabeçalho; `example.com` pode não enviá-lo.
+8. No **Composer** do Fiddler (ou ferramenta equivalente), envie um `GET` para `http://httpbin.org/cache` incluindo o cabeçalho `If-Modified-Since` com o valor exato de `Last-Modified` observado no passo anterior.
 9. Localize a sessão condicional gerada no passo 8 e confirme que a resposta retornou `304 Not Modified`. Use esta sessão condicional como a linha 7 da tabela. Se o servidor retornar `200 OK`, registre os cabeçalhos de cache observados e explique a diferença.
 
 **Registrar no relatório:**
@@ -247,7 +264,7 @@ Adicionalmente, para observar um **304 Not Modified** de forma controlada:
 | `Content-Encoding`   |                         |                 |                     |
 | `Set-Cookie`         |                         |                 |                     |
 | `Cache-Control`      |                         |                 |                     |
-| `Strict-Transport-Security` |                  |                 |                     |
+| `Strict-Transport-Security` | Não esperado em HTTP — ver Pergunta 5.3 |  |  |
 
 **Pergunta 5.1:** O servidor retornou `Content-Encoding: gzip` (ou `br`)? Se sim, compare o valor de `Content-Length`, quando presente, com o tamanho do conteúdo visível na aba **Response → TextView**. O que explica a diferença?
 
@@ -298,8 +315,8 @@ Adicionalmente, para observar um **304 Not Modified** de forma controlada:
 
 1. Em uma janela anônima, acessar `http://httpbin.org/cookies/set?disciplina=redes&professor=claudio`.
 2. Observar o **`Set-Cookie`** na resposta. Anotar os valores.
-3. Seguir o redirecionamento automático para `http://httpbin.org/cookies` (pode ser necessário um clique).
-4. Observar o cabeçalho **`Cookie`** enviado nesta segunda requisição.
+3. O httpbin retorna um `302` que o navegador segue automaticamente para `http://httpbin.org/cookies`. Isso gera **duas sessões** no Fiddler: a primeira com status `302` (contendo `Set-Cookie`) e a segunda com status `200` (contendo `Cookie`). Se o navegador não seguir automaticamente, acesse `http://httpbin.org/cookies` manualmente.
+4. Observar o cabeçalho **`Cookie`** enviado na segunda requisição (sessão com status `200`).
 5. Recarregar mais duas vezes a página `http://httpbin.org/cookies`.
 
 **Registrar no relatório:**
@@ -309,6 +326,8 @@ Adicionalmente, para observar um **304 Not Modified** de forma controlada:
 **Pergunta 7.1:** O cabeçalho `Set-Cookie` só aparece uma vez ou em toda requisição? Justifique.
 
 **Pergunta 7.2:** Que atributos o `Set-Cookie` trouxe (`Path`, `Domain`, `Expires`, `Max-Age`, `Secure`, `HttpOnly`, `SameSite`)? Para cada um presente, explique brevemente sua função. Se algum atributo da lista não apareceu, registre como **não observado**.
+
+> **Nota:** o httpbin define cookies mínimos — apenas o atributo `Path=/` estará presente nas respostas deste exercício. Registre todos os demais atributos listados como **não observado** e, para cada um, explique o comportamento padrão adotado pelo navegador na ausência desse atributo (ex.: sem `Expires`/`Max-Age`, o cookie é de sessão; sem `Secure`, pode ser enviado por HTTP; sem `SameSite`, o navegador aplica a política padrão da versão em uso).
 
 **Pergunta 7.3:** O atributo `Secure` **pode** aparecer em um cookie recebido por HTTP puro como neste exercício? Qual o comportamento esperado do navegador se um cookie `Secure` **fosse** enviado nesta conexão? Relacione com o fato de que todo o tráfego desta atividade é **visível em texto claro** ao Fiddler (e, portanto, a qualquer observador na rede).
 
@@ -320,7 +339,9 @@ Adicionalmente, para observar um **304 Not Modified** de forma controlada:
 
 **Objetivo:** compreender o proxy como agente ativo, capaz de modificar tráfego em trânsito.
 
-1. No Fiddler, habilitar **breakpoint de request**: menu **Rules → Automatic Breakpoints → Before Requests** (atalho **F11**).
+> **Atividade exclusiva do Fiddler Classic.** As etapas de breakpoint abaixo dependem do menu **Rules → Automatic Breakpoints**, disponível apenas no Fiddler Classic. Usuários com mitmproxy ou HTTP Toolkit podem pular para a Atividade 9 e responder às questões 8.1 e 8.2 de forma teórica.
+
+1. No Fiddler, habilitar **breakpoint de request**: menu **Rules → Automatic Breakpoints → Before Requests**. O atalho documentado é **F11**, mas em alguns laboratórios pode conflitar com teclas de função do sistema — nesse caso use sempre o caminho de menu.
 2. No navegador, acessar `http://httpbin.org/user-agent`.
 3. A sessão pausará no Fiddler com um ícone vermelho.
 4. Na aba **Inspectors → Request → Raw**, editar o cabeçalho `User-Agent` para um valor inventado, por exemplo:
@@ -351,7 +372,7 @@ Adicionalmente, para observar um **304 Not Modified** de forma controlada:
 **Registrar no relatório:**
 - Captura de tela da sessão.
 - *Status-line* completa da resposta.
-- Cabeçalho `Location` da resposta (se presente).
+- Cabeçalho `Location` da resposta (obrigatório em qualquer resposta `3xx` — se estiver ausente, registre isso como anomalia e verifique se capturou a sessão correta).
 
 **Pergunta 9.1:** Qual foi o **código de status** retornado e qual **cabeçalho** direcionou o navegador para `https://`?
 
@@ -359,39 +380,35 @@ Adicionalmente, para observar um **304 Not Modified** de forma controlada:
 
 **Pergunta 9.3:** Se o servidor enviasse o cabeçalho citado em 9.2 por uma resposta servida via **HTTP puro** (porta 80), o navegador deveria obedecer? Justifique com base na RFC.
 
----
-
-## 4. Questões de Verificação
-
-Responda no relatório. Respostas concisas, com base no observado, são preferíveis a explicações genéricas.
-
-1. Qual é a **ordem dos elementos** em uma mensagem HTTP/1.1? O que separa os cabeçalhos do corpo?
-2. Por que o cabeçalho `Host` é **obrigatório** em HTTP/1.1 mas era opcional em HTTP/1.0? (Dica: virtual hosting.)
-3. Explique a diferença entre os códigos `401 Unauthorized` e `403 Forbidden`.
-4. Um `POST` enviado duas vezes produz o mesmo efeito que um único envio? E um `PUT`? Justifique em termos de **idempotência**.
-5. Por que HTTPS, mesmo cifrando todo o tráfego de aplicação, ainda permite que um observador saiba **qual site** o usuário está visitando? (Cite SNI e DNS.)
-6. O que `Content-Encoding: gzip` muda no fluxo? Em que ponto os dados são compactados e em que ponto são descompactados?
-7. Um servidor envia `Cache-Control: no-store` em uma resposta. Qual o impacto prático no comportamento do navegador?
-8. Com base na fundamentação teórica (seção 4.6 do [`readme.md`](../readme.md)), descreva em até 5 linhas como um *debugging proxy* consegue decifrar HTTPS sem violar a criptografia — e por que isso **só é possível com cooperação do usuário** (e por que, justamente por isso, você não pôde executar essa etapa).
-9. Dê um exemplo concreto, observado nas atividades, de um cabeçalho de **request** que o navegador envia automaticamente, sem a página pedir.
-10. Se você quisesse automatizar a inspeção (script), qual das ferramentas alternativas da seção 2.1 seria mais adequada? Por quê?
-11. (**Exclusiva do Fluxo B**) Liste **três cabeçalhos de segurança** que **não aparecem ou não fazem sentido** em respostas servidas por HTTP puro (p. ex. `Strict-Transport-Security`, `Content-Security-Policy` com diretivas `upgrade-insecure-requests`, `Set-Cookie; Secure`). Para cada um, explique o que aconteceria se fosse enviado por um servidor HTTP: alguns seriam **ignorados** pelo navegador, outros só têm efeito quando recebidos **via** HTTPS. Cite a RFC 6797 para o caso do HSTS.
 
 ---
 
-## 5. Entrega
+## 4. Entrega
 
 ### O que entregar
-- Arquivo **`relatorio.md`** preenchido (template nesta mesma pasta).
+- Arquivo **`relatorio.pdf`** gerado a partir do `relatorio.md` preenchido (ver instruções abaixo).
 - Pasta **`evidencias/`** com as capturas de tela nomeadas por atividade (`atv1_sessao.png`, `atv3_post_raw.png`, etc.), incluindo a captura da Atividade 9 (redirecionamento controlado de `http://httpbin.org/...` para `https://httpbin.org/get`).
 
+### Como gerar o PDF a partir do `relatorio.md`
+
+O relatório é escrito em Markdown. Converta-o para PDF usando um dos serviços gratuitos abaixo — nenhum exige cadastro:
+
+| Ferramenta | URL | Como usar |
+|---|---|---|
+| **Markdown to PDF** (md2pdf) | https://md2pdf.netlify.app | Cole o conteúdo do `relatorio.md` ou arraste o arquivo; clique em **Convert**. |
+| **Dillinger** | https://dillinger.io | Abra o arquivo pelo menu *Import From → Markdown File*; exporte pelo menu *Export As → PDF*. |
+| **Markdown PDF** (extensão VS Code) | Pesquisar *"Markdown PDF"* na aba de extensões do VS Code | Com o `relatorio.md` aberto, acionar `Ctrl+Shift+P` → *"Markdown PDF: Export (pdf)"*. Não requer internet. |
+| **Pandoc** (linha de comando) | https://pandoc.org/installing.html | `pandoc relatorio.md -o relatorio.pdf` (requer instalação local; sem acesso à internet depois de instalado). |
+
+> **Dica:** antes de gerar o PDF, revise o preview do Markdown (VS Code: `Ctrl+Shift+V`) para confirmar que tabelas e blocos de código estão formatados corretamente. Imagens referenciadas em `evidencias/` devem estar na mesma pasta para aparecerem no PDF.
+
 ### Como entregar
-- Compactar a pasta do aluno em `NOME_RA_LAB_HTTP_FLUXOB.zip`.
+- Compactar a pasta do aluno em `NOME_RA_LAB_HTTP_FLUXOB.zip` contendo o `relatorio.pdf` e a pasta `evidencias/`.
 - Submeter no **Microsoft Teams**, atividade correspondente, até a data definida em aula.
 
 ---
 
-## 6. Encerramento
+## 5. Encerramento
 
 
 1. **Reabilitar** o HTTPS-First Mode / HTTPS-Only Mode no navegador (passos inversos de 2.2), para que seu dia-a-dia volte a priorizar conexões seguras.
