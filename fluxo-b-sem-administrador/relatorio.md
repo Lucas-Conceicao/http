@@ -27,7 +27,7 @@
 
 ## Atividade 1 — Primeira captura (`http://example.com`)
 
-**Captura de tela:** `evidencias/atv1_sessao.png`
+**Captura de tela:** <img width="1919" height="964" alt="image" src="https://github.com/user-attachments/assets/b691bc45-49d1-49d6-a1d0-2a86f0b93a39" />
 
 **Request-line enviada:**
 
@@ -67,52 +67,71 @@ Cabeçalhos:
 
 ## Atividade 2 — Anatomia de um GET (`http://httpbin.org/get?...`)
 
-**Captura de tela:** `evidencias/atv2_raw.png`
-
+**Captura de tela:** <img width="1916" height="990" alt="image" src="https://github.com/user-attachments/assets/fc4a0e1d-cfc5-4d52-9fba-a1826f90dd27" />
+ 
 **Request-line completa:**
 
 ```http
-[colar aqui]
+GET http://httpbin.org/get?aluno=Lucas_Conceicao&curso=redes HTTP/1.1
+Host: httpbin.org
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36 Edg/148.0.0.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Accept-Encoding: gzip, deflate
+Accept-Language: pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6
 ```
 
 **Cabeçalhos-chave capturados:**
 
-| Cabeçalho    | Valor                    |
-|--------------|--------------------------|
-| `Host`       | [...]                    |
-| `User-Agent` | [...]                    |
-| `Accept`     | [...]                    |
+| Cabeçalho    | Valor                                                                                                                                  |
+|--------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| `Host`       | httpbin.org                                                                                                                            |
+| `User-Agent` |Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36 Edg/148.0.0.0           |
+| `Accept`     | text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7|
 
 **Campos do JSON de resposta:**
 
 ```json
 {
-  "args":    [colar valor],
-  "headers": [colar valor resumido],
-  "origin":  [colar valor]
+  "args": {
+    "aluno": "Lucas_Conceicao", 
+    "curso": "redes"
+  }, 
+  "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7", 
+    "Accept-Encoding": "gzip, deflate", 
+    "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6", 
+    "Host": "httpbin.org", 
+    "Upgrade-Insecure-Requests": "1", 
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36 Edg/148.0.0.0", 
+    "X-Amzn-Trace-Id": "Root=1-69ff8797-66862fc5233b87406c7e58e6"
+  }, 
+  "origin": "187.58.19.47", 
+  "url": "http://httpbin.org/get?aluno=Lucas_Conceicao&curso=redes"
 }
 ```
 
 ### Pergunta 2.1
 > O valor do campo `origin` corresponde a qual elemento da rede? Por que normalmente não é o IP local?
 
-**Resposta:** [...]
+**Resposta:** O valor do campo origin corresponde ao IP de origem da response. Pois, o IP local é o Ip do cliente e a resposta vem do IP do servidor.
 
 ### Pergunta 2.2
-> Compare o `User-Agent` enviado com o que aparece no JSON da resposta. Coincidem?
+> Compare o `User-Agent` enviado com o que aparece no JSON da resposta. Coincidem? 
 
-**Resposta:** [...]
+**Resposta:** Sim.
 
 ### Pergunta 2.3
 > Em `http://httpbin.org/headers`, liste até três cabeçalhos que o servidor vê mas **não aparecem** no Raw do request. De onde vêm? Se não encontrar três, explique por que o resultado pode variar.
 
 **Resposta:**
 
-| Cabeçalho visto pelo servidor | Origem provável | Observação |
-|-------------------------------|-----------------|------------|
-| [...]                         | [...]           | [...]      |
-| [...]                         | [...]           | [...]      |
-| [...]                         | [...]           | [...]      |
+| Cabeçalho visto pelo servidor                                | Origem provável | Observação |
+|--------------------------------------------------------------|-----------------|------------|
+| "X-Amzn-Trace-Id": "Root=1-69ff8797-66862fc5233b87406c7e58e6"| AWS Service     | [...]      |
+| [...]                                                        | [...]           | [...]      |
+| [...]                                                        | [...]           | [...]      |
 
 ---
 
