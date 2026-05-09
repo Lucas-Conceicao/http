@@ -12,16 +12,16 @@
 
 | Campo                                       | Valor                                         |
 |---------------------------------------------|-----------------------------------------------|
-| Nome                                        | [seu nome completo]                           |
+| Nome                                        |Helena da Silva Ramos e Lucas Conceição Ricardo|
 | RA                                          | [seu RA]                                      |
 | Disciplina                                  | Redes de Computadores                         |
-| Turma                                       | [sua turma]                                   |
-| Data                                        | [data da realização]                          |
+| Turma                                       | ADS noturno 5°Ciclo                           |
+| Data                                        | 09/05/2026                                    |
 | Fluxo                                       | **B — Aluno sem privilégio de administrador** |
-| SO utilizado                                | [Windows 10/11]                               |
+| SO utilizado                                | Windows 11                                    |
 | Ferramenta de proxy                         | Fiddler Classic per-user                      |
-| Navegador(es)                               | [Chrome 124 / Firefox 125 / ...]              |
-| HTTPS-First Mode / HTTPS-Only desabilitado? | [sim / não]                                   |
+| Navegador(es)                               | Chrome 124                                    |
+| HTTPS-First Mode / HTTPS-Only desabilitado? | sim                                           |
 
 ---
 
@@ -32,30 +32,36 @@
 **Request-line enviada:**
 
 ```http
-[colar aqui a linha inicial do request, ex: GET / HTTP/1.1]
+GET http://example.com/ HTTP/1.1
 ```
 
 **Status-line recebida:**
 
 ```http
-[colar aqui, ex: HTTP/1.1 200 OK]
+HTTP/1.1 200 OK
 ```
 
 ### Pergunta 1.1
 > Quantos cabeçalhos o navegador enviou no request? Liste-os.
 
 **Resposta:**
-[número total]
+8
 
 Cabeçalhos:
-- [cabeçalho 1]
-- [cabeçalho 2]
-- ...
+- GET http://example.com/ HTTP/1.1
+- Host: example.com
+- Connection: keep-alive
+- Upgrade-Insecure-Requests: 1
+- User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari
+- Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+- Accept-Encoding: gzip, deflate
+- Accept-Language: pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7
+
 
 ### Pergunta 1.2
 > Qual foi o `Content-Length` da resposta? Se ele não apareceu, registre `Transfer-Encoding`, versão do protocolo ou outro indício observado. O corpo retornado é HTML, texto puro, JSON ou binário? Como você descobriu?
 
-**Resposta:** [...]
+**Resposta:** Content-Length: 528. O corpo retornado está em HTML, nós descobrimos através da linha 3 do cabeçalho (Content-Type: text/html).
 
 ---
 
